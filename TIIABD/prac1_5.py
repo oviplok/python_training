@@ -1,38 +1,20 @@
-import pandas as pd
-from sklearn.datasets import fetch_california_housing
+import string
 
-data = fetch_california_housing(as_frame=True)
 
 if __name__ == '__main__':
-    # Преобразование датасета в объект DataFrame из pandas
-    df = pd.DataFrame(data.data, columns=data.feature_names)
+    numbs = []
+    sum_numbs = 0
 
-    print(df.info())
+    while True:
+        num = int(input("number: "))
+        numbs.append(num)
+        sum_numbs += num
 
-    print("\n/////////////////////////////////////////////////////////\n")
+        if sum_numbs == 0:
+            break
 
-    print(df.isna().sum())
+    #Вот это я уже нашел
+    sum_squares = sum([n ** 2 for n in numbs])
+    print("sum:", sum_squares)
 
-    print("\n/////////////////////////////////////////////////////////\n")
 
-    print(df.loc[(df['AveBedrms'] > 50) & (df['Population'] > 2500)])
-
-    print("\n/////////////////////////////////////////////////////////\n")
-
-    # Получение массива значений медианной стоимости домов
-    median_house_prices = data.target
-
-    # Нахождение максимального и минимального значений
-    max_price = max(median_house_prices)
-    min_price = min(median_house_prices)
-
-    # Вывод результатов
-    print("max:", max_price)
-    print("min:", min_price)
-    print("\n/////////////////////////////////////////////////////////\n")
-    # Вывод названия признака и его среднего значения
-    mean_values = df.mean()
-    for feature, mean_value in mean_values.items():
-        print("Название признака:", feature)
-        print("Среднее значение:", mean_value)
-        print()

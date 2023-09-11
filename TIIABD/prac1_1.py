@@ -3,6 +3,7 @@ import string
 
 d = dict()
 
+
 def round_fig(x):
     result = math.pi * (x ** 2)
     return {'round', result}
@@ -29,6 +30,7 @@ if __name__ == '__main__':
         print("param: ")
         x = int(input())
         answer = (round_fig(x))
+        print(answer)
 
     # Вызов метода квадрата
     if figure == "block":
@@ -37,6 +39,7 @@ if __name__ == '__main__':
         print("\nparam 2: ")
         y = int(input())
         answer = (block_fig(x, y))
+        print(answer)
 
     # Вызов метода треугольника
     if figure == "triangle":
@@ -45,4 +48,4 @@ if __name__ == '__main__':
         print("\nparam 2: ")
         y = int(input())
         answer = (tri_fig(x, y))
-
+        print(answer)
