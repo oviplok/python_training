@@ -1,18 +1,11 @@
 import matplotlib
-import numpy as np
 import pandas as pd
-from sklearn import datasets, __all__, preprocessing
-from sklearn.datasets import fetch_openml, load_digits
-import csv
+from sklearn import preprocessing
+from sklearn.datasets import fetch_openml
 from sklearn.manifold import TSNE
-from sklearn import manifold, datasets
 import plotly.graph_objs as go
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
 import seaborn as sns
-import umap
-# import umap.plot as umap_plot
-import time
 import os
 
 matplotlib.use('TkAgg')
