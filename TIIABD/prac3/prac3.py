@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
+from scipy.stats import shapiro, bartlett, ttest_ind, chisquare, chi2_contingency
 import matplotlib.pyplot as plt
 import matplotlib
 
@@ -223,23 +224,93 @@ def part9_10_11():
 
 def part12():
     data = pd.read_csv('ECDCCases.csv')
-    pass
+
+    # Найти дубликаты в данных
+    duplicates = data.duplicated()
+    # Посмотреть количество дубликатов
+    duplicate_count = duplicates.sum()
+    print("Количество дубликатов:", duplicate_count)
+    # Удалить дубликаты из данных
+    # data = data.drop_duplicates()
+
+
+def part13():
+    data = pd.read_csv('bmi.csv')
+
+    # Создать выборки для региона northwest и southwest
+    northwest_data = data[data['region'] == 'northwest']['bmi']
+    southwest_data = data[data['region'] == 'southwest']['bmi']
+
+    # Проверить выборки на гомогенность дисперсии (критерий Бартлетта)
+    _, p_value_bartlett = bartlett(northwest_data, southwest_data)
+
+    # Сравнить средние значения выборок с использованием t-критерия Стьюдента
+    _, p_value_ttest = ttest_ind(northwest_data, southwest_data)
+
+    # Проверить выборки на нормальность (критерий Шапиро-Уилка)
+    _, p_value_northwest = shapiro(northwest_data)
+    _, p_value_southwest = shapiro(southwest_data)
+
+    print("\nПроверка гомогенности дисперсии:")
+    print("p-value для критерия Бартлетта:", p_value_bartlett)
+
+    print("\nСравнение средних значений:")
+    print("p-value для t-критерия Стьюдента:", p_value_ttest)
+
+    # Вывести результаты проверки
+    print("Проверка нормальности:")
+    print("p-value для выборки с региона northwest:", p_value_northwest)
+    print("p-value для выборки с региона southwest:", p_value_southwest)
+
+
+def part14():
+    drops = [97, 98, 109, 95, 97, 104]
+    expects = [100, 100, 100, 100, 100, 100]
+
+    chisq, p_v = chisquare(drops, expects)
+    if chisq > 0.05:
+        print("Распределение является равномерным")
+    else:
+        print("Распределение не является равномерным")
+
+
+def part15():
+    # Создать датафрейм
+    data = pd.DataFrame({'Женат': [89, 17, 11, 43, 22, 1],
+                         'Гражданский брак': [80, 22, 20, 35, 6, 4],
+                         'Не состоит в отношениях': [35, 44, 35, 6, 8, 22]})
+    data.index = ['Полный рабочий день', 'Частичная занятость',
+                  'Временно не работает', 'На домохозяйстве',
+                  'На пенсии', 'Учёба']
+
+    chi2, p_value, dof, expected = chi2_contingency(data)
+
+    print("Статистика критерия Хи-квадрат:", chi2)
+    print("p-значение:", p_value)
 
 
 if __name__ == '__main__':
-    # print("choose part(1 or 4 or 5 or 6):")
-    # x = int(input())
-    # if x == 1:
-    #     part1To3()
-    # if x == 4:
-    #     part4()
-    # if x == 5:
-    #     part5()
-    # if x == 6:
-    #     part6()
-    # if x == 7:
-    # part7()
-    # part8()
-    # part9_10_11()
-    part12()
-    pass
+    print("choose part(dont choose 12 please):")
+    x = int(input())
+    if 4 > x > 0:
+        part1To3()
+    if x == 4:
+        part4()
+    if x == 5:
+        part5()
+    if x == 6:
+        part6()
+    if x == 7:
+        part7()
+    if x == 8:
+        part8()
+    if x == (9 or 10 or 11):
+        part9_10_11()
+    if x == 12:
+        part12()
+    if x == 13:
+        part13()
+    if x == 14:
+        part14()
+    if x == 15:
+        part15()
