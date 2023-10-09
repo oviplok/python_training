@@ -1,24 +1,10 @@
-import matplotlib
-from scipy import rand
-
-matplotlib.use('TkAgg')
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
-
-from sklearn import datasets, __all__, preprocessing
-from sklearn.datasets import fetch_openml, load_digits
-import csv
-from sklearn.manifold import TSNE
-from sklearn import manifold, datasets
-import plotly.graph_objs as go
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import OneHotEncoder
-import seaborn as sns
-import umap
-# import umap.plot as umap_plot
-import time
-import os
+import matplotlib
+
+matplotlib.use('TkAgg')
 
 
 def part1To3():
@@ -174,6 +160,72 @@ def part7():
     print("99% Confidence Interval:", bmi_confidence_interval_99)
 
 
+def part8():
+    data = pd.read_csv('insurance.csv')
+
+    bmi = data['bmi'].dropna()
+    # KS-тест
+    ks_statistic_bmi, p_value_bmi = stats.kstest(bmi, 'norm')
+    print("KS-тест для индекса массы тела:")
+    print("Статистика:", ks_statistic_bmi)
+    print("p-значение:", p_value_bmi)
+    # q-q plot
+    plt.figure(figsize=(8, 6))
+    stats.probplot(bmi, dist="norm", plot=plt)
+    plt.title("q-q plot для индекса массы тела")
+    plt.show()
+
+    # Проверка нормальности распределения расходов
+    charges = data['charges'].dropna()
+    # KS-тест
+    ks_statistic_charges, p_value_charges = stats.kstest(charges, 'norm')
+    print("KS-тест для расходов:")
+    print("Статистика:", ks_statistic_charges)
+    print("p-значение:", p_value_charges)
+    # q-q plot
+    plt.figure(figsize=(8, 6))
+    stats.probplot(charges, dist="norm", plot=plt)
+    plt.title("q-q plot для расходов")
+    plt.show()
+
+
+def part9_10_11():
+    print("\npart9")
+    data = pd.read_csv('ECDCCases.csv')
+    print("\npart10")
+    # Проверить наличие пропущенных значений
+    missing_values = data.isnull().sum()
+    # Получить количество пропущенных значений в процентах
+    missing_percent = (missing_values / len(data)) * 100
+    print(missing_percent)
+
+    drop_features = missing_values.nlargest(2).index
+    data = data.drop(drop_features, axis=1)
+    data.describe()
+
+    print("\npart11")
+    # Определить выбросы для признака cases
+    Q1 = np.percentile(data['cases'], 25)
+    Q3 = np.percentile(data['cases'], 75)
+    IQR = Q3 - Q1
+
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+
+    outliers = data[(data['cases'] < lower_bound) | (data['cases'] > upper_bound)]
+    # Фильтровать данные, где количество смертей в день превышает 3000
+    filtered_data = data[data['deaths'] > 3000]
+
+    # Получить количество таких дней для каждой страны
+    count_days = filtered_data.groupby('countriesAndTerritories')['dateRep'].count()
+    print(count_days)
+
+
+def part12():
+    data = pd.read_csv('ECDCCases.csv')
+    pass
+
+
 if __name__ == '__main__':
     # print("choose part(1 or 4 or 5 or 6):")
     # x = int(input())
@@ -186,4 +238,8 @@ if __name__ == '__main__':
     # if x == 6:
     #     part6()
     # if x == 7:
-    part7()
+    # part7()
+    # part8()
+    # part9_10_11()
+    part12()
+    pass
