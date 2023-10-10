@@ -152,6 +152,7 @@ def part4():
     fig_pie.show()
 
 
+# IRIS
 def part5():
     print_razd(5)
     # Выбор показателя для оси X
@@ -201,18 +202,18 @@ def part5():
 def part6():
     print_razd(6)
     # T =TSNE(n_components=)
-    global data
+    data = pd.read_csv('iris.csv')
     df = data
     df.shape
-    non_numeric = ['name', 'type1', 'type2', 'legendary']
+    non_numeric = ['variety']
     df_numeric = df.drop(non_numeric, axis=1)
     df_numeric.shape
     m = TSNE(learning_rate=50)
     tsne_features = m.fit_transform(df_numeric)
     tsne_features[1:4, :]
-    df['total_power'] = tsne_features[:, 0]
-    df['generation'] = tsne_features[:, 1]
-    sns.scatterplot(x="total_power", y="generation", data=df, hue=data['type1'])
+    df['petal.length'] = tsne_features[:, 0]
+    df['sepal.length'] = tsne_features[:, 1]
+    sns.scatterplot(x="petal.length", y="sepal.length", data=df, hue=data['variety'])
     plt.show()
 
 
@@ -224,10 +225,12 @@ def part6_v2():
 
 def part7():
     print_razd(7)
-    global data
+    data = pd.read_csv('iris.csv')
     df = data
+    d_x = data[['petal.length', 'sepal.length']]
+    d_y = data['sepal.length']
     df.shape
-    non_numeric = ['name', 'type1', 'type2', 'legendary']
+    non_numeric = ['variety']
     df_numeric = df.drop(non_numeric, axis=1)
     df_numeric.shape
     scaler = preprocessing.MinMaxScaler()
@@ -239,20 +242,22 @@ def part7():
         for min_dist in m_d:
             umap = UMAP(n_neighbors=n_neighbors, min_dist=min_dist)
             start_time = time.time()
-            x_embedded = umap.fit_transform(df_numeric)
+            x_embedded = umap.fit_transform(d_x, d_y)
             end_time = time.time()
             time_took = end_time - start_time
             plt.figure(figsize=(8, 6))
-            plt.scatter(
-                x_embedded[:, 0],
-                x_embedded[:, 1],
-                cmap=plt.colormaps.get_cmap(cmap="jet"),
-                c=data['generation'].astype(int)
-
-            )
-            plt.colorbar(ticks=range(10))
-            plt.title(f"UMAP (with n_neighbors {n_neighbors}, min_dist {min_dist})")
-            print(f"UMAP – time (with n_neighbors {n_neighbors}, min_dist {min_dist}): {time_took:.2f} seconds")
+            # plt.scatter(
+            #     x_embedded[:, 0],
+            #     x_embedded[:, 1],
+            #     cmap=plt.colormaps.get_cmap(cmap="jet"),
+            #     hue=data['variety']
+            # )
+            df['pet'] = x_embedded[:, 0]
+            df['sep'] = x_embedded[:, 1]
+            sns.scatterplot(x="pet", y="sep", data=df, hue=data['variety'])
+#            plt.colorbar(ticks=range(10))
+#             plt.title(f"UMAP (with n_neighbors {n_neighbors}, min_dist {min_dist})")
+#             print(f"UMAP – time (with n_neighbors {n_neighbors}, min_dist {min_dist}): {time_took:.2f} seconds")
             plt.show()
 
 
@@ -287,6 +292,6 @@ if __name__ == '__main__':
     # part2()
     # part3()
     # part4()
-    part5()
-    # part6()
-    #part7()
+    # part5()
+    part6()
+    part7()

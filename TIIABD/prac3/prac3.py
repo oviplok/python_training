@@ -242,14 +242,14 @@ def part13():
     southwest_data = data[data['region'] == 'southwest']['bmi']
 
     # Проверить выборки на гомогенность дисперсии (критерий Бартлетта)
-    _, p_value_bartlett = bartlett(northwest_data, southwest_data)
+    p_value_bartlett = bartlett(northwest_data, southwest_data)
 
     # Сравнить средние значения выборок с использованием t-критерия Стьюдента
-    _, p_value_ttest = ttest_ind(northwest_data, southwest_data)
+    p_value_ttest = ttest_ind(northwest_data, southwest_data)
 
     # Проверить выборки на нормальность (критерий Шапиро-Уилка)
-    _, p_value_northwest = shapiro(northwest_data)
-    _, p_value_southwest = shapiro(southwest_data)
+    p_value_northwest = shapiro(northwest_data)
+    p_value_southwest = shapiro(southwest_data)
 
     print("\nПроверка гомогенности дисперсии:")
     print("p-value для критерия Бартлетта:", p_value_bartlett)
@@ -304,7 +304,7 @@ if __name__ == '__main__':
         part7()
     if x == 8:
         part8()
-    if x == (9 or 10 or 11):
+    if 12 > x > 8:
         part9_10_11()
     if x == 12:
         part12()
