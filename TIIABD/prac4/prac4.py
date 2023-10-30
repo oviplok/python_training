@@ -47,59 +47,41 @@ def part2():
     x = df['age']
     y = df['charges']
 
-    # Среднее x и y
     mean_x = x.mean()
     mean_y = y.mean()
-    # Вычисление разницы между x и средним x и y и средним y
+
     diff_x = x - mean_x
     diff_y = y - mean_y
-    # Вычислите наклон (slope) и сдвиг (intercept)
+    # наклон (slope) и сдвиг (intercept)
     slope = (diff_x * diff_y).sum() / (diff_x ** 2).sum()
     intercept = mean_y - slope * mean_x
-    # Вычислите прогнозные значения y
+    # прогнозные значения y
     predicted_y = slope * x + intercept
-    # Вычислите среднеквадратичную ошибку (MSE)
+    # среднеквадратичная ошибка (MSE)
     mse = mean_squared_error(y, predicted_y)
-    # Выведите наклон, сдвиг и MSE
+
     print("Наклон (slope):", slope)
     print("Сдвиг (intercept):", intercept)
     print("Среднеквадратичная ошибка (MSE):", mse)
 
-    # Вычислите наклон и сдвиг регрессионной линии
-    slope, intercept = np.polyfit(x, y, 1)
-    # Вычислите прогнозные значения y
+    # наклон и сдвиг регрессионной линии
+    # slope, intercept = np.polyfit(x, y, 1)
+    # прогнозные значения y
     predicted_y = slope * x + intercept
-    # Создайте график
+    # график
     plt.scatter(x, y, label='Данные')
     plt.plot(x, predicted_y, color='r', label='Регрессионная линия')
     plt.xlabel('Age')
     plt.ylabel('Charges')
     plt.title('Регрессия между Age и Charges')
     plt.legend()
-    # Отобразите график
     plt.show()
 
 
 def part3():
     data = pd.read_csv('insurance.csv')
     # print(data.head())
-
-    # Проведение предобработки данных
-    # Возможные шаги предобработки включают:
-    # 1. Обработка пропущенных значений
-    # 2. Кодирование категориальных переменных (например, пол, регион)
-    # 3. Масштабирование числовых переменных (например, возраст, стоимость страховки)
-    # Примеры простых шагов предобработки:
-    # 1. Обработка пропущенных значений
     data = data.dropna()  # удалить строки с пропущенными значениями
-
-    # # 2. Кодирование категориальных переменных
-    # data = pd.get_dummies(data, columns=['sex', 'region'])  # создать бинарные столбцы для каждой категории
-    #
-    # # 3. Масштабирование числовых переменных
-    # scaler = MinMaxScaler()
-    # data[['age', 'bmi', 'children']] = scaler.fit_transform(data[['age', 'bmi', 'children']])
-
     # Вывод преобразованных данных
     print(data.head())
 
@@ -110,10 +92,9 @@ def part3():
     region_3_bmi = data[data['region'] == 'northwest']['bmi']
     region_4_bmi = data[data['region'] == 'northeast']['bmi']
 
-    # Выполняем ANOVA-тест
+    # ANOVA-тест
     statistic_3_1, p_value_3_1 = f_oneway(region_1_bmi, region_2_bmi, region_3_bmi, region_4_bmi)
 
-    # Выводим результаты
     print("Статистика ANOVA:", statistic_3_1)
     print("p-value:", p_value_3_1)
 
@@ -137,7 +118,7 @@ def part3():
 
         stat, p_value_3_1 = ttest_ind(bmi_region_1, bmi_region_2)
 
-        if p_value_3_1 < 0.05:
+        if p_value_3_1 < alpha:
             print(
                 f"Статистически значимая разница в индексе массы тела между регионом {region_1} и регионом {region_2}")
 
@@ -166,9 +147,9 @@ def part3():
     F_sex = anova_table_3_5['F'][1]
     p_value_sex = anova_table_3_5['PR(>F)'][1]
 
-    # Проверяем, есть ли статистически значимая разница
+    # статистически значимая разница
     if p_value_region < 0.05 or p_value_sex < 0.05:
-        # Выполняем пост-хок тесты Тьюки
+        # пост-хок тесты Тьюки
         posthoc_region = mc.MultiComparison(data['bmi'], data['region'])
         posthoc_sex = mc.MultiComparison(data['bmi'], data['sex'])
         result_region = posthoc_region.tukeyhsd()
@@ -180,10 +161,7 @@ def part3():
         print("\nРезультаты пост-хок теста для пола:")
         print(result_sex)
 
-        # Строим график
         sns.boxplot(x='region', y='bmi', hue='sex', data=data)
-
-        # Показываем график
         plt.show()
     else:
         print("Нет статистически значимой разницы между группами.")
