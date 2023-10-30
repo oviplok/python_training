@@ -1,6 +1,16 @@
 import numpy as np
+import statsmodels.stats.multicomp as mc
 import pandas as pd
+from statsmodels.formula.api import ols
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import mean_squared_error
+from scipy.stats import f_oneway
+from statsmodels.formula.api import ols
+from statsmodels.stats.anova import anova_lm
+from scipy.stats import ttest_ind
+import itertools
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib
 
 matplotlib.use('TkAgg')  # Use the TkAgg backend
@@ -70,5 +80,114 @@ def part2():
     plt.show()
 
 
+def part3():
+    data = pd.read_csv('insurance.csv')
+    # print(data.head())
+
+    # Проведение предобработки данных
+    # Возможные шаги предобработки включают:
+    # 1. Обработка пропущенных значений
+    # 2. Кодирование категориальных переменных (например, пол, регион)
+    # 3. Масштабирование числовых переменных (например, возраст, стоимость страховки)
+    # Примеры простых шагов предобработки:
+    # 1. Обработка пропущенных значений
+    data = data.dropna()  # удалить строки с пропущенными значениями
+
+    # # 2. Кодирование категориальных переменных
+    # data = pd.get_dummies(data, columns=['sex', 'region'])  # создать бинарные столбцы для каждой категории
+    #
+    # # 3. Масштабирование числовых переменных
+    # scaler = MinMaxScaler()
+    # data[['age', 'bmi', 'children']] = scaler.fit_transform(data[['age', 'bmi', 'children']])
+
+    # Вывод преобразованных данных
+    print(data.head())
+
+    print("\n---Part 3.1--------------------------")
+    # Создаем список данных BMI для каждого региона
+    region_1_bmi = data[data['region'] == 'southwest']['bmi']
+    region_2_bmi = data[data['region'] == 'southeast']['bmi']
+    region_3_bmi = data[data['region'] == 'northwest']['bmi']
+    region_4_bmi = data[data['region'] == 'northeast']['bmi']
+
+    # Выполняем ANOVA-тест
+    statistic_3_1, p_value_3_1 = f_oneway(region_1_bmi, region_2_bmi, region_3_bmi, region_4_bmi)
+
+    # Выводим результаты
+    print("Статистика ANOVA:", statistic_3_1)
+    print("p-value:", p_value_3_1)
+
+    print("\n---Part 3.2--------------------------")
+    model = ols('bmi ~ region', data=data).fit()
+    anova_table = anova_lm(model)
+    print(anova_table)
+
+    print("\n---Part 3.3--------------------------")
+    regions = data['region'].unique()
+    region_pairs = list(itertools.combinations(regions, 2))
+
+    alpha = 0.05 / len(region_pairs)  # Определение уровня значимости после поправки Бонферрони
+
+    for pair in region_pairs:
+        region_1 = pair[0]
+        region_2 = pair[1]
+
+        bmi_region_1 = data[data['region'] == region_1]['bmi']
+        bmi_region_2 = data[data['region'] == region_2]['bmi']
+
+        stat, p_value_3_1 = ttest_ind(bmi_region_1, bmi_region_2)
+
+        if p_value_3_1 < 0.05:
+            print(
+                f"Статистически значимая разница в индексе массы тела между регионом {region_1} и регионом {region_2}")
+
+    print("\n---Part 3.4--------------------------")
+    F = anova_table['F'][0]
+    p_value_3_5 = anova_table['PR(>F)'][0]
+    if p_value_3_5 < alpha:
+        posthoc = mc.pairwise_tukeyhsd(data['bmi'], data['region'])
+        print(posthoc)
+        # Plot the results
+        sns.pairplot(hue='region', data=data)
+        posthoc.plot_simultaneous()
+        plt.show()
+    else:
+        print("Нет статистически значимой разницы между группами.")
+
+    print("\n---Part 3.5--------------------------")
+    model_3_5 = ols('bmi ~ region + sex', data=data).fit()
+    anova_table_3_5 = anova_lm(model_3_5)
+
+    # Выводим результаты
+    print(anova_table_3_5)
+    print("\n---Part 3.6--------------------------")
+    F_region = anova_table_3_5['F'][0]
+    p_value_region = anova_table_3_5['PR(>F)'][0]
+    F_sex = anova_table_3_5['F'][1]
+    p_value_sex = anova_table_3_5['PR(>F)'][1]
+
+    # Проверяем, есть ли статистически значимая разница
+    if p_value_region < 0.05 or p_value_sex < 0.05:
+        # Выполняем пост-хок тесты Тьюки
+        posthoc_region = mc.MultiComparison(data['bmi'], data['region'])
+        posthoc_sex = mc.MultiComparison(data['bmi'], data['sex'])
+        result_region = posthoc_region.tukeyhsd()
+        result_sex = posthoc_sex.tukeyhsd()
+
+        # Выводим результаты пост-хок тестов
+        print("Результаты пост-хок теста для региона:")
+        print(result_region)
+        print("\nРезультаты пост-хок теста для пола:")
+        print(result_sex)
+
+        # Строим график
+        sns.boxplot(x='region', y='bmi', hue='sex', data=data)
+
+        # Показываем график
+        plt.show()
+    else:
+        print("Нет статистически значимой разницы между группами.")
+
+
 if __name__ == '__main__':
-    part2()
+    part3()
