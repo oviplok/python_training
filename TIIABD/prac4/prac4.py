@@ -128,7 +128,7 @@ def part3():
     if p_value_3_5 < alpha:
         posthoc = mc.pairwise_tukeyhsd(data['bmi'], data['region'])
         print(posthoc)
-        # Plot the results
+
         sns.pairplot(hue='region', data=data)
         posthoc.plot_simultaneous()
         plt.show()
@@ -160,8 +160,10 @@ def part3():
         print(result_region)
         print("\nРезультаты пост-хок теста для пола:")
         print(result_sex)
-
-        sns.boxplot(x='region', y='bmi', hue='sex', data=data)
+        data['combination'] = data['sex'] + "/" + data['region']
+        posthocu = mc.pairwise_tukeyhsd(data['bmi'], data['combination'])
+        posthocu.plot_simultaneous()
+        #sns.boxplot(x='region', y='bmi', hue='sex', data=data)
         plt.show()
     else:
         print("Нет статистически значимой разницы между группами.")
