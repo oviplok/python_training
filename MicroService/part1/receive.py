@@ -7,7 +7,9 @@ connection = pika.BlockingConnection(pika.ConnectionParameters('51.250.26.59',
                                                                                      'guest123')))
 channel = connection.channel()
 # Название эксклюзивной очереди
-queue_name = 'ikbo-12_egorov03'
+
+queue_name = 'ikbo-12_egorov'
+channel.queue_delete(queue=queue_name)
 
 channel.queue_declare(queue=queue_name, exclusive=True)
 
