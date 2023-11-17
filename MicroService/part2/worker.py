@@ -23,7 +23,7 @@ print('Waiting for messages. To exit press CTRL+C')
 
 def callback(ch, method, properties, body):
     print("Received %r" % (body,))
-    time.sleep(body.count(10))
+    time.sleep(body.count(b'.'))
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
 
